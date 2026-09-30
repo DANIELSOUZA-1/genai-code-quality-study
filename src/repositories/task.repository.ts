@@ -4,7 +4,7 @@ import { Task, CreateTaskDTO, UpdateTaskDTO, TaskStatus } from '../models/task.m
 export class TaskRepository {
   public async create(userId: number, taskData: CreateTaskDTO): Promise<Task> {
     const db = await getDatabase();
-    const status = taskData.status ?? TaskStatus.PENDING;
+    const status = taskData.status !== undefined ? taskData.status : TaskStatus.PENDING;
 
     const result = await db.run(
       `INSERT INTO tasks (title, description, status, user_id) VALUES (?, ?, ?, ?)`,
@@ -18,7 +18,7 @@ export class TaskRepository {
   public async findById(id: number): Promise<Task | null> {
     const db = await getDatabase();
     const task = await db.get<Task>(`SELECT * FROM tasks WHERE id = ?`, [id]);
-    return task ?? null;
+    return task !== undefined ? task : null;
   }
 
   public async findByUserId(userId: number): Promise<Task[]> {
@@ -59,6 +59,6 @@ export class TaskRepository {
   public async delete(id: number): Promise<boolean> {
     const db = await getDatabase();
     const result = await db.run(`DELETE FROM tasks WHERE id = ?`, [id]);
-    return (result.changes ?? 0) > 0;
+    return result.changes !== undefined && result.changes > 0;
   }
 }

@@ -4,7 +4,7 @@ import { User, CreateUserDTO, UserResponseDTO, UserRole } from '../models/user.m
 export class UserRepository {
   public async create(userData: CreateUserDTO): Promise<UserResponseDTO> {
     const db = await getDatabase();
-    const role = userData.role ?? UserRole.USER;
+    const role = userData.role !== undefined ? userData.role : UserRole.USER;
 
     const result = await db.run(
       `INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)`,
@@ -19,7 +19,7 @@ export class UserRepository {
   public async findByEmail(email: string): Promise<User | null> {
     const db = await getDatabase();
     const user = await db.get<User>(`SELECT * FROM users WHERE email = ?`, [email]);
-    return user ?? null;
+    return user !== undefined ? user : null;
   }
 
   public async findById(id: number): Promise<UserResponseDTO | null> {
@@ -28,7 +28,7 @@ export class UserRepository {
       `SELECT id, name, email, role, created_at FROM users WHERE id = ?`,
       [id]
     );
-    return user ?? null;
+    return user !== undefined ? user : null;
   }
 
   public async findAll(): Promise<UserResponseDTO[]> {

@@ -4,7 +4,7 @@ import { initDatabase } from './config/database.js';
 
 dotenv.config();
 
-const PORT = process.env.PORT ?? 3000;
+const PORT = process.env.PORT !== undefined ? process.env.PORT : 3000;
 
 async function startServer() {
   try {
