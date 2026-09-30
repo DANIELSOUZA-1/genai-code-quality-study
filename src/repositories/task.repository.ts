@@ -4,7 +4,7 @@ import { Task, CreateTaskDTO, UpdateTaskDTO, TaskStatus } from '../models/task.m
 export class TaskRepository {
   public async create(userId: number, taskData: CreateTaskDTO): Promise<Task> {
     const db = await getDatabase();
-    const status = taskData.status !== undefined ? taskData.status : TaskStatus.PENDING;
+    const status = taskData.status ?? TaskStatus.PENDING;
 
     const result = await db.run(
       `INSERT INTO tasks (title, description, status, user_id) VALUES (?, ?, ?, ?)`,
@@ -18,7 +18,7 @@ export class TaskRepository {
   public async findById(id: number): Promise<Task | null> {
     const db = await getDatabase();
     const task = await db.get<Task>(`SELECT * FROM tasks WHERE id = ?`, [id]);
-    return task !== undefined ? task : null;
+    return task ?? null;
   }
 
   public async findByUserId(userId: number): Promise<Task[]> {
@@ -44,9 +44,9 @@ export class TaskRepository {
       return null;
     }
 
-    const title = taskData.title !== undefined ? taskData.title : currentTask.title;
-    const description = taskData.description !== undefined ? taskData.description : currentTask.description;
-    const status = taskData.status !== undefined ? taskData.status : currentTask.status;
+    const title = taskData.title ?? currentTask.title;
+    const description = taskData.description ?? currentTask.description;
+    const status = taskData.status ?? currentTask.status;
 
     await db.run(
       `UPDATE tasks SET title = ?, description = ?, status = ? WHERE id = ?`,
@@ -59,6 +59,6 @@ export class TaskRepository {
   public async delete(id: number): Promise<boolean> {
     const db = await getDatabase();
     const result = await db.run(`DELETE FROM tasks WHERE id = ?`, [id]);
-    return result.changes !== undefined && result.changes > 0;
+    return (result.changes ?? 0) > 0;
   }
 }
