@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
 import dotenv from 'dotenv';
-import path from 'path';
+import path from 'node:path';
 
 dotenv.config();
 

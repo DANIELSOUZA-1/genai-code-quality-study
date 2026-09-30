@@ -1,12 +1,24 @@
 import express, { Request, Response } from 'express';
+import 'express-async-errors';
 import cors from 'cors';
 import routes from './routes/index.js';
 import { errorMiddleware } from './middlewares/error.middleware.js';
+import { AppError } from './utils/custom-error.js';
 
 const app = express();
+app.disable('x-powered-by');
 
 // Middlewares globais
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new AppError('Not allowed by CORS', 403));
+    }
+  }
+}));
 app.use(express.json());
 
 // Rota de Healthcheck

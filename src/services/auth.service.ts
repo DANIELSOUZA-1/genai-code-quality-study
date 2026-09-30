@@ -1,15 +1,11 @@
 import bcrypt from 'bcryptjs';
 import { UserRepository } from '../repositories/user.repository.js';
-import { CreateUserDTO, LoginResponseDTO, UserResponseDTO } from '../models/user.model.js';
+import { CreateUserDTO, LoginResponseDTO, UserResponseDTO, UserRole } from '../models/user.model.js';
 import { AppError } from '../utils/custom-error.js';
 import { generateToken } from '../utils/jwt.js';
 
 export class AuthService {
-  private userRepository: UserRepository;
-
-  constructor() {
-    this.userRepository = new UserRepository();
-  }
+  constructor(private readonly userRepository: UserRepository = new UserRepository()) {}
 
   public async register(userData: CreateUserDTO): Promise<UserResponseDTO> {
     const existingUser = await this.userRepository.findByEmail(userData.email);
@@ -23,6 +19,7 @@ export class AuthService {
     const user = await this.userRepository.create({
       ...userData,
       password: hashedPassword,
+      role: UserRole.USER,
     });
 
     return user;
@@ -35,7 +32,7 @@ export class AuthService {
       throw new AppError('Credenciais inválidas', 401);
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password!);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
       throw new AppError('Credenciais inválidas', 401);

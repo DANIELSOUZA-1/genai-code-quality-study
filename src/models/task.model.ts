@@ -1,4 +1,8 @@
-export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+export enum TaskStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+}
 
 export interface Task {
   id: number;

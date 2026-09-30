@@ -3,7 +3,10 @@ import { TokenPayload } from '../@types/express.js';
 import { AppError } from './custom-error.js';
 
 const getJwtSecret = (): string => {
-  return process.env.JWT_SECRET || 'fallback_secret_key';
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
+  return process.env.JWT_SECRET;
 };
 
 export const generateToken = (payload: TokenPayload): string => {

@@ -5,7 +5,7 @@ import { AppError } from '../utils/custom-error.js';
 export const authMiddleware = (req: Request, _res: Response, next: NextFunction): void => {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith('Bearer ')) {
     throw new AppError('Não autorizado. Token de acesso ausente ou malformatado', 401);
   }
 

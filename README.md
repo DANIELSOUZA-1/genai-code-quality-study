@@ -28,7 +28,6 @@ genai-code-quality-study/
 ├── package.json
 ├── tsconfig.json
 ├── .env.example
-├── .env
 ├── README.md
 └── src/
     ├── @types/
@@ -93,12 +92,15 @@ Crie um arquivo `.env` na raiz do projeto (ou copie do `.env.example`):
 cp .env.example .env
 ```
 
+**ATENÇÃO:** O arquivo `.env` nunca deve ser versionado no Git. Ele já foi adicionado ao `.gitignore`.
+
 Conteúdo do `.env`:
 
 ```env
 PORT=3000
-JWT_SECRET=super_secret_jwt_key_change_in_production_12345
+JWT_SECRET= # Insira aqui um segredo criptograficamente aleatório
 DATABASE_FILE=./database.sqlite
+ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
 ```
 
 ### 4. Inicialização do Projeto
@@ -127,8 +129,8 @@ Ao iniciar, as tabelas `users` e `tasks` serão automaticamente criadas no arqui
 ## 🔒 Regras de Negócio e Acesso (RBAC)
 
 1. **Tipos de Usuário**:
-   - `USER`: Usuário comum. Pode criar, visualizar, editar e excluir **apenas as suas próprias tarefas**.
-   - `ADMIN`: Administrador. Pode consultar **todos os usuários cadastrados** e **todas as tarefas existentes no sistema**, além de gerenciar tarefas.
+   - `USER`: Usuário comum. Cria, consulta, altera e exclui apenas as suas próprias tarefas.
+   - `ADMIN`: Administrador. Pode consultar todos os usuários cadastrados e todas as tarefas existentes no sistema. Pode gerenciar somente tarefas das quais é proprietário. Não pode alterar ou excluir tarefas pertencentes a outros usuários.
 
 2. **Segurança de Tarefas**:
    - Um usuário com perfil `USER` receberá código HTTP `403 Forbidden` caso tente acessar, alterar ou excluir a tarefa pertencente a outro usuário.
@@ -150,11 +152,10 @@ Ao iniciar, as tabelas `users` e `tasks` serão automaticamente criadas no arqui
   {
     "name": "Maria Silva",
     "email": "maria@example.com",
-    "password": "senhaSegura123",
-    "role": "USER"
+    "password": "senhaSeguraMuitoLonga123"
   }
   ```
-  _(Nota: O campo `role` é opcional e assume `"USER"` por padrão. Passe `"ADMIN"` para criar um usuário administrador)._
+  _(Nota: O cadastro público cria apenas usuários com o perfil `USER`. Não é possível criar administradores por esta rota. A senha deve ter no mínimo 15 caracteres e no máximo 72 caracteres)._
 - **Resposta Sucesso (201 Created)**:
   ```json
   {
@@ -172,12 +173,12 @@ Ao iniciar, as tabelas `users` e `tasks` serão automaticamente criadas no arqui
 #### 🔹 Login
 
 - **POST** `/auth/login`
-- **Acesso**: Público
+- **Acesso**: Público (Protegido por Rate Limiting: máximo de 10 tentativas a cada 15 minutos)
 - **Body**:
   ```json
   {
     "email": "maria@example.com",
-    "password": "senhaSegura123"
+    "password": "senhaSeguraMuitoLonga123"
   }
   ```
 - **Resposta Sucesso (200 OK)**:
