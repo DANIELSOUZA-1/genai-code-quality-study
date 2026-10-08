@@ -368,7 +368,7 @@ describe('API Tests - GenAI Code Quality Study', () => {
     // 25. CORS restritivo
     it('should return 403 Forbidden for unauthorized CORS origins', async () => {
       const res = await request(app)
-        .get('/api/health') // Rota livre de auth para testar apenas o CORS
+        .get('/health') // Rota livre de auth para testar apenas o CORS
         .set('Origin', 'http://malicious-site.com');
       
       expect(res.status).toBe(403);
@@ -377,7 +377,7 @@ describe('API Tests - GenAI Code Quality Study', () => {
 
     // 26. Ocultar X-Powered-By
     it('should not expose X-Powered-By header in HTTP responses', async () => {
-      const res = await request(app).get('/api/health');
+      const res = await request(app).get('/health');
       expect(res.headers['x-powered-by']).toBeUndefined();
     });
 
